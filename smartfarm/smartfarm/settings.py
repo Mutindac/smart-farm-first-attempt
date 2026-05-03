@@ -41,7 +41,6 @@ ALLOWED_HOSTS = []
 
 INSTALLED_APPS = [
     'cloudinary',
-    'cloudinary_storage',
     'django.contrib.staticfiles',
     'accounts',
     'fields',
@@ -154,7 +153,7 @@ STORAGES = {
         "BACKEND": "whitenoise.storage.CompressedManifestStaticFilesStorage",
     },
     "default": {
-        "BACKEND": "cloudinary_storage.storage.MediaCloudinaryStorage",
+        "BACKEND": "django.core.files.storage.FileSystemStorage",
     },
 }
 # Default primary key field type
