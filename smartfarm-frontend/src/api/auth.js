@@ -1,12 +1,18 @@
 const BASE_URL = "http://127.0.0.1:7000";
 
-async function request(url, options = {}) {
+async function request(url, options = {}, isFormData = false) {
+  const headers = isFormData
+    ? {
+        ...(options.headers || {})
+      }
+    : {
+        "Content-Type": "application/json",
+        ...(options.headers || {})
+      };
+
   const res = await fetch(`${BASE_URL}${url}`, {
-    headers: {
-      "Content-Type": "application/json",
-      ...(options.headers || {})
-    },
-    ...options
+    ...options,
+    headers
   });
 
   return res.json();
@@ -34,80 +40,83 @@ export const logout = (token, refresh) =>
     body: JSON.stringify({ refresh })
   });
 
+// FIELDS
 export const createField = (data, token) =>
-  fetch("http://127.0.0.1:7000/fields/create/", {
+  request("/fields/create/", {
     method: "POST",
     headers: {
-      "Content-Type": "application/json",
       Authorization: `Bearer ${token}`
     },
     body: JSON.stringify(data)
-  }).then(res => res.json());
-
+  });
 
 export const updateField = (id, data, token) =>
-  fetch(`http://127.0.0.1:7000/fields/update/${id}/`, {
+  request(`/fields/update/${id}/`, {
     method: "PATCH",
     headers: {
-      "Content-Type": "application/json",
       Authorization: `Bearer ${token}`
     },
     body: JSON.stringify(data)
-  }).then(res => res.json());
+  });
 
 export const getMyFields = (token) =>
-  fetch("http://127.0.0.1:7000/fields/my-fields/", {
+  request("/fields/my-fields/", {
     method: "GET",
     headers: {
-      "Content-Type": "application/json",
       Authorization: `Bearer ${token}`
     }
-  }).then(res => res.json());
-
-
-
-export const getAgents = (token) =>
-  fetch("http://127.0.0.1:7000/accounts/agents/", {
-    method: "GET",
-    headers: {
-      "Content-Type": "application/json",
-      Authorization: `Bearer ${token}`
-    }
-  }).then(res => res.json());
-
-
-export const createFieldUpdate = (data, token) =>
-  fetch("http://127.0.0.1:7000/updates/create/", {
-    method: "POST",
-    headers: {
-      "Content-Type": "application/json",
-      Authorization: `Bearer ${token}`
-    },
-    body: JSON.stringify(data)
-  }).then(res => res.json());
-
-export const getFieldUpdates = (fieldId, token) =>
-  fetch(`${BASE_URL}/updates/${fieldId}/`, {
-    method: "GET",
-    headers: {
-      "Content-Type": "application/json",
-      Authorization: `Bearer ${token}`
-    }
-  }).then(res => res.json());
+  });
 
 export const getAdminFields = (token) =>
-  fetch(`${BASE_URL}/fields/admin-fields/`, {
+  request("/fields/admin-fields/", {
     method: "GET",
     headers: {
-      "Content-Type": "application/json",
       Authorization: `Bearer ${token}`
     }
-  }).then(res => res.json());
+  });
 
 export const deleteField = (id, token) =>
-  fetch(`${BASE_URL}/fields/delete/${id}/`, {
+  request(`/fields/delete/${id}/`, {
     method: "DELETE",
     headers: {
-      Authorization: `Bearer ${token}`,
+      Authorization: `Bearer ${token}`
+    }
+  });
+
+// AGENTS
+export const getAgents = (token) =>
+  request("/accounts/agents/", {
+    method: "GET",
+    headers: {
+      Authorization: `Bearer ${token}`
+    }
+  });
+
+// FIELD UPDATES
+export const createFieldUpdate = (data, token) => {
+  const formData = new FormData();
+
+  Object.keys(data).forEach((key) => {
+    formData.append(key, data[key]);
+  });
+
+  return request(
+    "/updates/create/",
+    {
+      method: "POST",
+      headers: {
+        Authorization: `Bearer ${token}`
+      },
+      body: formData
     },
-  }).then(res => res.json());
+    true
+  );
+};
+
+export const getFieldUpdates = (fieldId, token) =>
+  request(`/updates/${fieldId}/`, {
+    method: "GET",
+    headers: {
+      Authorization: `Bearer ${token}`
+    }
+  });
