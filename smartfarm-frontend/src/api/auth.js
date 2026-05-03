@@ -1,4 +1,4 @@
-const BASE_URL = "http://127.0.0.1:7000";
+const BASE_URL = "https://smart-farm-u9b8.onrender.com";
 
 async function request(url, options = {}, isFormData = false) {
   const headers = isFormData
